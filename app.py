@@ -11,7 +11,7 @@ Run with: streamlit run app.py
 
 import streamlit as st
 import pandas as pd
-import matplotlib.pyplot as plt
+import plotly.graph_objects as go
 import os
 
 DATA_DIR = "data"
@@ -27,22 +27,60 @@ def load_data(ticker: str) -> pd.DataFrame:
 
 
 def plot_price_with_anomalies(df: pd.DataFrame, ticker: str):
+    """Plot price with anomalies marked using plotly."""
     anomalies = df[df["Is_Anomaly"]]
-    fig, ax = plt.subplots(figsize=(10, 4))
-    ax.plot(df.index, df["Close"], label="Close Price", color="steelblue", linewidth=1)
-    ax.scatter(anomalies.index, anomalies["Close"], color="red", label="Anomaly", zorder=5, s=40)
-    ax.set_title(f"{ticker} - Closing Price with Flagged Anomalies")
-    ax.set_ylabel("Price ($)")
-    ax.legend()
+    
+    fig = go.Figure()
+    
+    # Add price line
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["Close"],
+        mode="lines",
+        name="Close Price",
+        line=dict(color="steelblue", width=2)
+    ))
+    
+    # Add anomaly points
+    fig.add_trace(go.Scatter(
+        x=anomalies.index,
+        y=anomalies["Close"],
+        mode="markers",
+        name="Anomaly",
+        marker=dict(color="red", size=8)
+    ))
+    
+    fig.update_layout(
+        title=f"{ticker} - Closing Price with Flagged Anomalies",
+        xaxis_title="Date",
+        yaxis_title="Price ($)",
+        hovermode="x unified",
+        height=400
+    )
+    
     return fig
 
 
 def plot_volatility(df: pd.DataFrame, ticker: str):
-    fig, ax = plt.subplots(figsize=(10, 3))
-    ax.plot(df.index, df["Rolling_Volatility"], color="darkorange", label="20-Day Rolling Volatility")
-    ax.set_title(f"{ticker} - Rolling Volatility")
-    ax.set_ylabel("Volatility")
-    ax.legend()
+    """Plot rolling volatility using plotly."""
+    fig = go.Figure()
+    
+    fig.add_trace(go.Scatter(
+        x=df.index,
+        y=df["Rolling_Volatility"],
+        mode="lines",
+        name="20-Day Rolling Volatility",
+        line=dict(color="darkorange", width=2)
+    ))
+    
+    fig.update_layout(
+        title=f"{ticker} - Rolling Volatility",
+        xaxis_title="Date",
+        yaxis_title="Volatility",
+        hovermode="x unified",
+        height=300
+    )
+    
     return fig
 
 
@@ -81,8 +119,8 @@ def main():
     col1, col2 = st.columns([3, 2])
 
     with col1:
-        st.pyplot(plot_price_with_anomalies(df, ticker))
-        st.pyplot(plot_volatility(df, ticker))
+        st.plotly_chart(plot_price_with_anomalies(df, ticker), use_container_width=True)
+        st.plotly_chart(plot_volatility(df, ticker), use_container_width=True)
 
     with col2:
         st.subheader("Flagged Anomaly Days")
