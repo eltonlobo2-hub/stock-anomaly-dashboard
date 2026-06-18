@@ -60,4 +60,4 @@ The dashboard will open automatically at `http://localhost:8501`.
 ## Author
 
 Elton Lobo
-[LinkedIn](your-linkedin-url-here) · eltonlobo2@gmail.com
+[LinkedIn](https://www.linkedin.com/in/elton-lobo-236326214/) · eltonlobo2@gmail.com
